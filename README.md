@@ -41,3 +41,34 @@ The Design Generator Pipeline first creates a file with the selection of what re
 > **Note:** To design an entire chain rather than just the interface, set `max_distance` to a very high value (e.g. `100` Å).
 
 After selecting residues, the pipeline runs ProteinMPNN to generate designs and outputs a PDB file for each generated design.  
+
+### Rosetta Scoring Pipeline
+
+The Rosetta Scoring Pipeline relaxes the redesigned backbones and computes interface energy using Rosetta’s FastRelax protocol. A default XML schema is provided (you can modify it via the standalone `createFastRelaxScript` notebook). The user needs to specify:
+
+- `interface` (string): chains defining the interface (e.g. `"A_BC"`)  
+- `repeats` (int, default: 1): number of times to repeat the FastRelax protocol  
+
+The pipeline outputs relaxed PDB files and a csv that includes interface energy scores and other relevant parameters such as the shape complementarity value.
+
+### AlphaFold Scoring Pipeline
+
+The AlphaFold3 Scoring Pipeline (currently recommended to use the AlphaFold3 Scoring Pipeline) runs AlphaFold to predict the structure of the top designs filtered by Rosetta scores and computes confidence metrics such as interface PAE, PLDDT and RMSD between design and prediction.
+(Before AF used to be the bottleneck, now I think rosetta is the bottleneck).
+
+The user must specify the number or seeds to be used or a provide a list of the specific. Note that for each seed → 5 models are predicted. In addition, users can customize how metrics are computed by choosing exactly which interface to evaluate for PAE (for example, focusing on A–BC contacts and ignoring any B–C interactions) and by selecting which chains to include in the pLDDT calculation (for instance, restricting pLDDT to chain A when only that chain has been designed).
+
+**User parameters:**  
+- `num_seeds` (int): number of random seeds to sample 
+- `predefined_seeds_list` (list[int], optional): specific seed values to use  
+
+
+**Outputs include:**  
+- CIF files for all predicted models (5 × `num_seeds` per design)  
+- Average interface PAE (iPAE)  
+- average pLDDT scores for selected chains
+- RMSD between the input design and each prediction
+
+
+
+
