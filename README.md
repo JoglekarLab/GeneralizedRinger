@@ -55,6 +55,7 @@ The user must specify the number or seeds to be used or a provide a list of the 
 
 ### STANDALONE NOTEBOOKS
 The notebooks are there to help you through the pipeline. The recommended use of the notebooks is the following:
+
 ![ringer_generalized4](https://github.com/user-attachments/assets/94edb0f8-2a02-47f4-98ad-f81b867f1321)
 
 
