@@ -14,22 +14,6 @@ The Geometry Scoring Pipeline assigns a score based on Cα–Cα distances betwe
 
 ### Design Generator Pipeline
 
-The Design Generator Pipeline first creates a file with the selection of what residues are to be designed
-The Design Generator Pipeline builds sequence designs for a specified interface while optionally keeping certain chains fixed. You can configure:
-
-For the Design Generator Pipeline, the user can select how to select the interface for design and which chains to keep fixed so they are not designed. The user can provide:
-
-- `max_distance` (distance between c alpha to be considered a contact)  
-- `cb_distance` (distance between c beta to be considered a contact)  
-- `extended_design = True` (if True uses the max_distance between c_alpha to check for contacts, if false uses the c beta)  
-- `interface = "A_BC"`  
-- `fixed_chains = "B,C"` (which chains not to be designed)
-
-> **Note:** To design a whole chain rather than just the interface, set `max_distance` to a very high number (e.g. 100).
-
-
-### Design Generator Pipeline
-
 The Design Generator Pipeline first creates a file with the selection of what residues are to be designed. For that selection, the user can configure:
 
 - `max_distance` (float): Cα–Cα distance threshold (Å) to define contacts  
@@ -40,7 +24,7 @@ The Design Generator Pipeline first creates a file with the selection of what re
 
 > **Note:** To design an entire chain rather than just the interface, set `max_distance` to a very high value (e.g. `100` Å).
 
-After selecting residues, the pipeline runs ProteinMPNN to generate designs and outputs a PDB file for each generated design.  
+After selecting residues, the pipeline runs **ProteinMPNN** to generate designs and outputs a PDB file for each generated design.  
 
 ### Rosetta Scoring Pipeline
 
@@ -53,7 +37,7 @@ The pipeline outputs relaxed PDB files and a csv that includes interface energy 
 
 ### AlphaFold Scoring Pipeline
 
-The AlphaFold3 Scoring Pipeline (currently recommended to use the AlphaFold3 Scoring Pipeline) runs AlphaFold to predict the structure of the top designs filtered by Rosetta scores and computes confidence metrics such as interface PAE, PLDDT and RMSD between design and prediction.
+The AlphaFold3 Scoring Pipeline (currently recommended to use the AlphaFold3 Scoring Pipeline) runs **AlphaFold** to predict the structure of the top designs filtered by Rosetta scores and computes confidence metrics such as interface PAE, PLDDT and RMSD between design and prediction.
 (Before AF used to be the bottleneck, now I think rosetta is the bottleneck).
 
 The user must specify the number or seeds to be used or a provide a list of the specific. Note that for each seed → 5 models are predicted. In addition, users can customize how metrics are computed by choosing exactly which interface to evaluate for PAE (for example, focusing on A–BC contacts and ignoring any B–C interactions) and by selecting which chains to include in the pLDDT calculation (for instance, restricting pLDDT to chain A when only that chain has been designed).
@@ -68,6 +52,10 @@ The user must specify the number or seeds to be used or a provide a list of the 
 - Average interface PAE (iPAE)  
 - average pLDDT scores for selected chains
 - RMSD between the input design and each prediction
+
+### STANDALONE NOTEBOOKS
+The notebooks are there to help you through the pipeline. The recommended use of the notebooks is the following:
+![ringer_generalized4](https://github.com/user-attachments/assets/94edb0f8-2a02-47f4-98ad-f81b867f1321)
 
 
 
