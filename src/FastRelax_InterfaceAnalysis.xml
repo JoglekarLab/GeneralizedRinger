@@ -1,0 +1,108 @@
+<ROSETTASCRIPTS>
+    <SCOREFXNS>
+      <ScoreFunction
+        name="beta"
+        weights="beta_nov16"/> 
+    </SCOREFXNS>
+    <RESIDUE_SELECTORS>
+        <!-- Layer Design -->
+        <Layer name="surface" select_core="false" select_boundary="false" select_surface="true" use_sidechain_neighbors="true"/>
+        <Layer name="boundary" select_core="false" select_boundary="true" select_surface="false" use_sidechain_neighbors="true"/>
+        <Layer name="core" select_core="true" select_boundary="false" select_surface="false" use_sidechain_neighbors="true"/>
+
+        <!-- Single‑chain selectors -->
+		<Chain name="chainA" chains="A"/>
+		<Chain name="chainB" chains="B"/>
+		<Chain name="chainC" chains="C"/>
+        
+        <!-- Interface selector -->
+        <Chain name="chainsA" chains="A"/>
+        <Chain name="chainsBC" chains="B,C"/>
+        <InterfaceByVector name="interfaceA_BC" cb_dist_cut="11" nearby_atom_cut="5.5" vector_angle_cut="75" vector_dist_cut="9" grp1_selector="chainsA" grp2_selector="chainsBC"/>
+        <Not name="not_interface" selector="interfaceA_BC"/>
+    </RESIDUE_SELECTORS>
+
+    <TASKOPERATIONS>        
+        <OperateOnResidueSubset name="restrict_to_interface" selector="not_interface">
+            <PreventRepackingRLT/>
+        </OperateOnResidueSubset>
+        <InitializeFromCommandline name="init"/>
+        <IncludeCurrent name="current" />
+        <LimitAromaChi2 name="limitchi2" chi2max="110" chi2min="70" include_trp="True" />
+    </TASKOPERATIONS>
+    
+    <FILTERS>
+        <ResidueCount name="hydrophobic_count" residue_types="ALA,VAL,ILE,LEU,MET,PHE,TRP,TYR" count_as_percentage="true" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="charged_count" residue_types="ARG,HIS,LYS,ASP,GLU" count_as_percentage="true" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="polar_uncharged_count" residue_types="SER,THR,ASN,GLN,CYS" count_as_percentage="true" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="leu_count" residue_types="LEU" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="ile_count" residue_types="ILE" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="val_count" residue_types="VAL" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="phe_count" residue_types="PHE" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="cys_count" residue_types="CYS" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="met_count" residue_types="MET" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="ala_count" residue_types="ALA" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="gly_count" residue_types="GLY" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="thr_count" residue_types="THR" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="ser_count" residue_types="SER" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="trp_count" residue_types="TRP" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="tyr_count" residue_types="TYR" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="pro_count" residue_types="PRO" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="his_count" residue_types="HIS" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="gln_count" residue_types="GLN" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="asn_count" residue_types="ASN" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="glu_count" residue_types="GLU" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="asp_count" residue_types="ASP" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="lys_count" residue_types="LYS" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+        <ResidueCount name="arg_count" residue_types="ARG" count_as_percentage="false" residue_selector="interfaceA_BC"/>
+    </FILTERS>
+
+    <MOVERS>
+        <FastRelax name="fastrelax" scorefxn="beta" repeats="1" batch="false" ramp_down_constraints="false" cartesian="false" 
+            bondangle="false" bondlength="false" min_type="dfpmin_armijo_nonmonotone" task_operations="init,current,restrict_to_interface,limitchi2">
+        <MoveMap name="movemap1">
+			<Chain number="1" chi="true" bb="true"/>
+			<Chain number="2" chi="true" bb="true"/>
+			<Chain number="3" chi="true" bb="true"/>
+
+        </MoveMap>
+        </FastRelax>
+        <MakePolyX name="mark_interface" aa="VAL" residue_selector="interfaceA_BC"/>
+        <InterfaceAnalyzerMover
+            name="int_ddG"
+            scorefxn="beta"
+            pack_separated="1"
+            pack_input="1"
+            packstat="1"
+            interface_sc="1"
+            interface="A_BC"/>
+    </MOVERS>
+
+    <PROTOCOLS>
+    	<Add mover_name="fastrelax" />
+        <Add mover_name="int_ddG"/>
+        <Add filter_name="hydrophobic_count" />
+        <Add filter_name="charged_count" />
+        <Add filter_name="polar_uncharged_count" />
+        <Add filter_name="leu_count" />
+        <Add filter_name="ile_count" />
+        <Add filter_name="val_count" />
+        <Add filter_name="phe_count" />
+        <Add filter_name="cys_count" />
+        <Add filter_name="met_count" />
+        <Add filter_name="ala_count" />
+        <Add filter_name="gly_count" />
+        <Add filter_name="thr_count" />
+        <Add filter_name="ser_count" />
+        <Add filter_name="trp_count" />
+        <Add filter_name="tyr_count" />
+        <Add filter_name="pro_count" />
+        <Add filter_name="his_count" />
+        <Add filter_name="gln_count" />
+        <Add filter_name="asn_count" />
+        <Add filter_name="glu_count" />
+        <Add filter_name="asp_count" />
+        <Add filter_name="lys_count" />
+        <Add filter_name="arg_count" />
+    </PROTOCOLS>
+</ROSETTASCRIPTS>
