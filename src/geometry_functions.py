@@ -86,7 +86,7 @@ def get_score (x, threshold = 6):
             y[i] = np.exp(y[i])
     return np.mean(y)
 
-def get_contacts(transformed_coords_by_chain, min_distance=5, max_distance=10):
+def get_contacts(transformed_coords_by_chain, min_distance=4, max_distance=10):
     '''
     Computes the distances between A0 and A1, A0 and B1, B0 and A1, and B0 and B1,
     then returns the minimum distance between each pair of points.
