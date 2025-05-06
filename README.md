@@ -28,10 +28,10 @@ After selecting residues, the pipeline runs **ProteinMPNN** to generate designs 
 
 ```python
 temperature_to_seq_count = {
-    0.15: 35,   # generate 35 sequences at temperature 0.15
-    0.25: 95,   # generate 95 sequences at temperature 0.25
-    0.30: 120,  # generate 120 sequences at temperature 0.30
-    0.35: 120   # generate 120 sequences at temperature 0.35
+    0.15: 35,   # generates 35 sequences at temperature 0.15
+    0.25: 95,   # generates 95 sequences at temperature 0.25 ...
+    0.30: 120,  
+    0.35: 120   
 }
 ```
 
