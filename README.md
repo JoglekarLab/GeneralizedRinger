@@ -33,6 +33,7 @@ temperature_to_seq_count = {
     0.30: 120,  # generate 120 sequences at temperature 0.30
     0.35: 120   # generate 120 sequences at temperature 0.35
 }
+```
 
 Each key is a sampling temperature and each value is how many sequences to sample at that temperature. This lets you explore designs under different levels of sequence diversity.
 
