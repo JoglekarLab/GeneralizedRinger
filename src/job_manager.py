@@ -24,7 +24,7 @@ class JobManager:
                     print(f"Job {job_id} is still running.")
 
             if len(completed_jobs) < len(job_ids):
-                print(f"Waiting for jobs to finish... Checking again in 5 minutes.")
+                print(f"Waiting for jobs to finish... Checking again in 3 minutes.")
                 time.sleep(180)  # Check every 3 minutes
 
         print("All jobs have finished.")
