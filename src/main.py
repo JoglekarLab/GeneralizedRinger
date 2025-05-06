@@ -18,7 +18,7 @@ nsym = args.nsym
 radius = args.radius
 monomer_pdb_path = "../0_Inputs/N271_xtal.pdb"
 
-pyrosetta_env = "/home/linamp/miniconda3/envs/myenv_gl/envs/rosetta_env"
+pyrosetta_env = "/nfs/turbo/umms-ajitj/conda_envs/rosetta_env"
 general_env = "/nfs/turbo/umms-ajitj/conda_envs/myenv"
 alphafold_env = '/nfs/turbo/umms-ajitj/AlphaFold2/localcolabfold/colabfold-conda'
 account = "ajitj99"
@@ -51,7 +51,7 @@ dirs = [
 ]
 
 for d in dirs:
-    os.makedirs(os.path.join("..", "src", d), exist_ok=True)
+    os.makedirs(os.path.join("..", d), exist_ok=True)
 
 
 # PARAMETERS
@@ -153,15 +153,6 @@ temperature_to_seq_count = {
 }
 DGpipeline = DesignGeneratorPipeline(nsym, radius, pyrosetta_env, general_env, account, temperature_to_seq_count, mpnn_output_base_path, source_folder_geometries_path, interface, fixed_chains, cb_distance, extended_design, max_distance)
 DGpipeline.run_pipeline()
-
-# # Run co-currently 
-# # AFpipeline.run_pipeline(rosetta_file_path, designs_scores) AND DGpipeline.run_pipeline()
-# process_1 = multiprocessing.Process(target=run_pipeline_function, args=(DGpipeline,))
-# process_2 = multiprocessing.Process(target=run_pipeline_function, args=(AFpipeline, rosetta_file_path, designs_scores))
-# process_1.start()
-# process_2.start()
-# process_1.join()
-# process_2.join()
 
 # Second round of Rosetta scoring pipeline
 mpnn_output_base_path = "../6_GenerateDesigns"
