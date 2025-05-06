@@ -84,5 +84,12 @@ The notebooks are there to help you through the pipeline. The recommended use of
 ![ringer_generalized4](https://github.com/user-attachments/assets/94edb0f8-2a02-47f4-98ad-f81b867f1321)
 
 
+## References
 
+- [AlphaFold 3](https://www.deepmind.com/research/highlighted-research/alphafold) – DeepMind's latest version of the AlphaFold protein structure prediction model.
+- [Rosetta](https://www.rosettacommons.org/) – A suite of software for computational modeling and analysis of protein structures.
+- [PyRosetta](https://www.pyrosetta.org/downloads#h.iwt5ktel05jc) - A Python library for Rosetta protein modeling software.
+- [ProteinMPNN](https://github.com/dauparas/ProteinMPNN) - Neural network-based design tool for protein sequences.
 
+The pipeline can also be run with LocalColabFold (AF2).
+- [localcolabfold](https://github.com/YoshitakaMo/localcolabfold) - Installer script designed to make ColabFold functionality available on users' local machines
