@@ -64,6 +64,21 @@ extended_design = True
 interface = "A_B"
 fixed_chains = "B"
 
+# Parameters for ProteinMPNN.
+# Importantly, note that you can select a different dictionary for the second round.
+# temperature_to_seq_count = {
+#     0.15: 35,
+#     0.25: 95,
+#     0.30: 120,
+#     0.35: 120
+# }
+
+# Number of sequences to generate per temperature
+temperature_to_seq_count = {
+    0.15: 2,
+    0.25: 2
+}
+
 # AF3
 seeds_number=1
 predefined_seeds=False
@@ -93,19 +108,6 @@ assert pdb_files, (
 # methods = ["annealing", "shgo", "brute"]
 # GOpipeline = GeometryOptimizationPipeline(nsym, radius, monomer_pdb_path, methods, pyrosetta_env, general_env, account)
 # GOpipeline.run_pipeline()
-
-# Number of sequences to generate per temperature
-# temperature_to_seq_count = {
-#     0.15: 35,
-#     0.25: 95,
-#     0.30: 120,
-#     0.35: 120
-# }
-
-temperature_to_seq_count = {
-    0.15: 2,
-    0.25: 2
-}
 
 # MPNN Design Pipeline
 source_folder_geometries = f'{clustering_base_path}/{nsym}mer/{nsym}_r{radius}/SelectedGeometries'
@@ -141,16 +143,7 @@ AFpipeline.run_pipeline(rosetta_file_path, designs_scores)
 # Second round of Pipeline to generate designs using ProteinMPNN
 mpnn_output_base_path = "../6_GenerateDesigns"
 source_folder_geometries_path = f'../3_MPNN_Design/{nsym}mer/{nsym}_r{radius}/SelectedDesigns'
-# temperature_to_seq_count = {
-#     0.15: 35,
-#     0.25: 95,
-#     0.30: 120,
-#     0.35: 120
-# }
-temperature_to_seq_count = {
-    0.15: 2,
-    0.25: 2
-}
+
 DGpipeline = DesignGeneratorPipeline(nsym, radius, pyrosetta_env, general_env, account, temperature_to_seq_count, mpnn_output_base_path, source_folder_geometries_path, interface, fixed_chains, cb_distance, extended_design, max_distance)
 DGpipeline.run_pipeline()
 
