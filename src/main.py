@@ -20,7 +20,6 @@ monomer_pdb_path = "../0_Inputs/N271_xtal.pdb"
 
 pyrosetta_env = "/nfs/turbo/umms-ajitj/conda_envs/rosetta_env"
 general_env = "/nfs/turbo/umms-ajitj/conda_envs/myenv"
-alphafold_env = '/nfs/turbo/umms-ajitj/AlphaFold2/localcolabfold/colabfold-conda'
 account = "ajitj99"
 rosetta_exec_path = "$ROSETTA3/bin/rosetta_scripts.default.linuxgccrelease"  # Path to Rosetta executable
 FastRelax_protocol_path = 'FastRelax_InterfaceAnalysis.xml' # Path to FastRelax plus InterfaceAnalyzer script
