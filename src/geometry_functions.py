@@ -6,12 +6,7 @@ from Bio.PDB.PDBParser import PDBParser
 from Bio.PDB.PDBIO import PDBIO
 from matplotlib import pyplot as plt
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import plotly.io as pio
-import plotly.figure_factory as ff
 import os
-import plotly.subplots as sp
 from scipy.stats import norm, kstest
 from Bio.PDB import PDBParser, Structure, Model, Chain, Residue, Atom, PDBIO
 # import nglview as nv
