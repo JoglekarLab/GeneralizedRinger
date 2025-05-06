@@ -31,7 +31,7 @@ if [ -d "$TEMP_DIR" ]; then
 fi
 mkdir -p "$TEMP_DIR"
 
-PROTEIN_MPNN_PATH="/home/linamp/Documents/ProteinMPNN"
+PROTEIN_MPNN_PATH="/nfs/turbo/umms-ajitj/ProteinMPNN"
 
 for pdb_file in "${INPUT_DIR}"/*.pdb; do
     printf "$pdb_file"
