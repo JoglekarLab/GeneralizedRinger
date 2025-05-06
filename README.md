@@ -24,7 +24,17 @@ The Design Generator Pipeline first creates a file with the selection of what re
 
 > **Note:** To design an entire chain rather than just the interface, set `max_distance` to a very high value (e.g. `100` Å).
 
-After selecting residues, the pipeline runs **ProteinMPNN** to generate designs and outputs a PDB file for each generated design.  
+After selecting residues, the pipeline runs **ProteinMPNN** to generate designs and outputs a PDB file for each generated design. You can control both the sampling temperature and the number of sequences generated at each temperature by passing a Python dictionary to the `temperature_to_seq_count` parameter. For example:
+
+```python
+temperature_to_seq_count = {
+    0.15: 35,   # generate 35 sequences at temperature 0.15
+    0.25: 95,   # generate 95 sequences at temperature 0.25
+    0.30: 120,  # generate 120 sequences at temperature 0.30
+    0.35: 120   # generate 120 sequences at temperature 0.35
+}
+
+Each key is a sampling temperature and each value is how many sequences to sample at that temperature. This lets you explore designs under different levels of sequence diversity.
 
 ### Rosetta Scoring Pipeline
 
