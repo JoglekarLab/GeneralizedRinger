@@ -12,7 +12,7 @@
 
 # Activate conda environment
 eval "$(conda shell.bash hook)"
-conda activate /home/linamp/miniconda3/envs/myenv_gl/envs/proteinMPNN
+conda activate /nfs/turbo/umms-ajitj/conda_envs/proteinmpnn_env
 
 INPUT_DIR="$1"  # Input directory e.g., ../Outputs-GeometryAnalizer/
 OUTPUT_DIR="$2"  # Output directory e.g., ../Outputs-ProteinMPNN
