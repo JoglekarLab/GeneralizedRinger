@@ -1,4 +1,6 @@
-# Easy run
+# GeneralizedRinger
+
+### Easy run
 You can run `main.py` directly using the `run_main.sh` script. The recommended workflow is the following:
 
 1. Open `run_main.sh` and modify the `radius` and `symmetry` parameters as needed.  
@@ -10,8 +12,7 @@ sbatch run_main.sh
 3. Add the necessary structure files to the generated folders.
 4. Re-run the script to complete the process.
 
-   
-# GeneralizedRinger
+### OVERVIEW 
 
 Generalized Ringer helps you build your custum protein design workflow from modular pipelines. The workflow is initially designed as the following:
 
