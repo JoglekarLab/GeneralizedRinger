@@ -1,0 +1,11 @@
+name: rosetta_env
+channels:
+  - https://conda.graylab.jhu.edu
+  - conda-forge
+  - defaults
+dependencies:
+  - pyrosetta
+  - pandas
+  - seaborn
+  - biopython
+  - scipy
