@@ -8,7 +8,7 @@
 #SBATCH --mem=4G
 #SBATCH --gres=gpu:1
 #SBATCH --time=30:00
-#SBATCH --account=lsa2
+#SBATCH --account=ajitj99
 
 # Activate conda environment
 eval "$(conda shell.bash hook)"
