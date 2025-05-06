@@ -96,13 +96,9 @@ conda activate {self.pyrosetta_env}
                 command += f" --dependency=afterok:{job_ids[-1]}"
             command += f" SS_ProteinMPNNGenerator.sh {self.output_folder_geometry} {self.output_folder_proteinmpnn} {int(seq_per_temp)} {temperature}"
             output = subprocess.run(command, shell=True, capture_output=True, text=True).stdout
-            try:
-                job_id = output.strip().split()[-1]
-                job_ids.append(job_id)
-                print(f"Submitted job {job_id} with temperature {temperature} and seq_per_temp {seq_per_temp}")
-            except IndexError:
-                print(f"Failed to submit job for temperature {temperature}")
-                break
+            job_id = output.strip().split()[-1]
+            job_ids.append(job_id)
+            print(f"Submitted job {job_id} with temperature {temperature} and seq_per_temp {seq_per_temp}", flush=True)
             time.sleep(5)
         JobManager.check_job_completion([job_id])
         return job_id
