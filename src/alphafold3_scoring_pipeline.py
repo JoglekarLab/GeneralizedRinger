@@ -158,7 +158,7 @@ class AlphaFold_3_ScoringPipeline:
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=1:15:00
-#SBATCH --mem=12GB
+#SBATCH --mem=128GB
 #SBATCH --account={self.account}
 
 # Optimize GPU memory
