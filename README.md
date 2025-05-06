@@ -1,16 +1,12 @@
 # Easy run
-You can run `main.py` directly using the `run_main.sh` script with the following command:
-
-```bash
-sbatch run_main.sh
-```
+You can run `main.py` directly using the `run_main.sh` script. The recommended workflow is the following:
 
 1. Open `run_main.sh` and modify the `radius` and `symmetry` parameters as needed.  
 2. Run the script once using:
-   ```bash
-   sbatch run_main.sh
-   ```
-Run the script once. It will likely fail on the first attempt, but this is expected. It will still create the required folder structure.
+```bash
+sbatch run_main.sh
+```
+   Run the script once. It will likely fail on the first attempt, but this is expected. It will still create the required folder structure.
 3. Add the necessary structure files to the generated folders.
 4. Re-run the script to complete the process.
 
