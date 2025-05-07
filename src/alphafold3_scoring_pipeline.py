@@ -152,7 +152,7 @@ class AlphaFold_3_ScoringPipeline:
 #SBATCH --job-name=AF3
 #SBATCH --output={self.slurm_folder}/AF3_%j.out
 #SBATCH --error={self.slurm_folder}/AF3_%j.err
-#SBATCH --partition=gpu_mig40,gpu
+#SBATCH --partition=spgpu
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
