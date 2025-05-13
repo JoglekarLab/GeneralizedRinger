@@ -64,7 +64,7 @@ for pdb_file in "${INPUT_DIR}"/*.pdb; do
     rm -rf "$TEMP_DIR"/*
 done
 
-Optionally, remove the TEMP_DIR entirely if no longer needed
+# Optionally, remove the TEMP_DIR entirely if no longer needed
 rm -rf "$TEMP_DIR"
 
 # Copy the fasta files of the designed sequences to the final output directory
