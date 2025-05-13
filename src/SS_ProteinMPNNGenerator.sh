@@ -70,7 +70,7 @@ for pdb_file in "${INPUT_DIR}"/*.pdb; do
             --bias_AA_jsonl $path_for_bias \
             --out_folder $output_dir \
             --num_seq_per_target "$NUM_SEQ_PER_TARGET" \
-            --batch_size 20 \
+            --batch_size 1 \
             --sampling_temp "$SAMPLING_TEMP"
     
     # Remove the temporary files in $TEMP_DIR
