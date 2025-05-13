@@ -90,3 +90,4 @@ for dir in "${OUTPUT_DIR}"/*; do
         rm -rf "$dir"
     fi
 done
+
