@@ -58,11 +58,11 @@ for d in dirs:
 # Parameters for selecting design chains (DesignGeneratorPipeline):
 # max_distance = 8.5
 # cb_distance = 7
-max_distance = 40
+max_distance = 100
 cb_distance = 7
 extended_design = True
-interface = "A_B"
-fixed_chains = "B"
+interface = "A_BC"
+fixed_chains = "B,C"
 
 # Parameters for ProteinMPNN.
 # Importantly, note that you can select a different dictionary for the second round.
@@ -85,7 +85,7 @@ predefined_seeds=False
 predefined_seeds_list=None
 dialect="alphafold3" # Usually, stick to this
 version=1 # Usually, stick to this
-pae_omit_pairs = []
+pae_omit_pairs = [['B','C']]
 plddt_chains = ['A']
 
 
