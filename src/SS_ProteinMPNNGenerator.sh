@@ -44,20 +44,33 @@ for pdb_file in "${INPUT_DIR}"/*.pdb; do
     input_design_residues="$TEMP_DIR/${PDB_NAME}_design_residues.txt"
     input_folder="$TEMP_DIR"
 
+    chains_to_design=$(awk 'NR==1' $input_design_residues)
+    design_only_positions=$(awk 'NR==2' $input_design_residues)
+
     printf "Input pdb: %s\n" "$PDB_NAME"
+    printf "Chains to design: %s\n" "$chains_to_design"
+    printf "Design only positions: %s\n" "$design_only_positions"
 
     output_dir="${OUTPUT_DIR}/${PDB_NAME}"
     mkdir -p $output_dir
     printf "Output dir: %s\n" "$output_dir"
 
     path_for_parsed_chains=$output_dir"/parsed_pdbs.jsonl"
+    path_for_assigned_chains=$output_dir"/assigned_pdbs.jsonl"
+    path_for_fixed_positions=$output_dir"/fixed_pdbs.jsonl"
+    path_for_bias=$PROTEIN_MPNN_PATH/helper_scripts/antielectrostatic_bias_pdbs.jsonl
 
     python $PROTEIN_MPNN_PATH/helper_scripts/parse_multiple_chains.py --input_path=$input_folder --output_path=$path_for_parsed_chains
+    python $PROTEIN_MPNN_PATH/helper_scripts/assign_fixed_chains.py --input_path=$path_for_parsed_chains --output_path=$path_for_assigned_chains --chain_list "$chains_to_design"
+    python $PROTEIN_MPNN_PATH/helper_scripts/make_fixed_positions_dict.py --input_path=$path_for_parsed_chains --output_path=$path_for_fixed_positions --chain_list "$chains_to_design" --position_list "$design_only_positions" --specify_non_fixed
     python $PROTEIN_MPNN_PATH/protein_mpnn_run.py \
             --jsonl_path $path_for_parsed_chains \
+            --chain_id_jsonl $path_for_assigned_chains \
+            --fixed_positions_jsonl $path_for_fixed_positions \
+            --bias_AA_jsonl $path_for_bias \
             --out_folder $output_dir \
-            --num_seq_per_target $NUM_SEQ_PER_TARGET \
-            --batch_size 2 \
+            --num_seq_per_target "$NUM_SEQ_PER_TARGET" \
+            --batch_size 20 \
             --sampling_temp "$SAMPLING_TEMP"
     
     # Remove the temporary files in $TEMP_DIR
