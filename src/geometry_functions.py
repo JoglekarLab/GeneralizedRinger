@@ -200,7 +200,7 @@ def get_all_pairs (pdb_path, omit_chain_pairs = []):
         print (pairs[i][0], pairs[i][1], 'lengths:', len(CA_coords_by_chain[pairs[i][0]]), len(CA_coords_by_chain[pairs[i][1]])) # Make sure the pairs considered are correct
     return pairs
 
-def general_get_contacts(pairs, min_distance=4, max_distance=10):
+def general_get_contacts(pairs, min_distance=3, max_distance=10):
     '''
     Computes the distances between the given pairs of chains and returns the minimum distance between each pair of points.
     Args:
