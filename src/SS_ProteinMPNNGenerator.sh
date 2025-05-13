@@ -73,11 +73,11 @@ for pdb_file in "${INPUT_DIR}"/*.pdb; do
             --batch_size 1 \
             --sampling_temp "$SAMPLING_TEMP"
     
-    # Remove the temporary files in $TEMP_DIR
+    Remove the temporary files in $TEMP_DIR
     rm -rf "$TEMP_DIR"/*
 done
 
-# Optionally, remove the TEMP_DIR entirely if no longer needed
+Optionally, remove the TEMP_DIR entirely if no longer needed
 rm -rf "$TEMP_DIR"
 
 # Copy the fasta files of the designed sequences to the final output directory
