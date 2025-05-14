@@ -69,8 +69,26 @@ The user must specify the number or seeds to be used or a provide a list of the 
 
 **User parameters:**  
 - `num_seeds` (int): number of random seeds to sample 
-- `predefined_seeds_list` (list[int], optional): specific seed values to use  
+- `predefined_seeds_list` (list[int], optional): specific seed values to use
 
+The following are user parameters related to the multiple sequence alignment for the AF3 prediction. Note that you can either not provide pre-computed MSAs for a chain or you can provide them in the form of a json `msas_path`. That json can be obtained from a previous run of AF3 in with the corresponding standalone notebook. If a previous MSA is provided it will be an unpairedMsa. In addition, the user can also provide pre-computed templates to be used for the prediction.
+
+- `msas_path` (str, optional)  
+  Path to a JSON file containing per‑chain entries under `"sequences"`.  
+  Each entry must include:  
+  - `"unpairedMsa"`: FASTA text (e.g. `">query\n…\n"`)  
+  - `"templates"`: list of template specs  
+  _Example:_ `../0_Inputs/msa_inputs/7b1f_data.json`
+
+- `msa_chains` (list[str] or False, default: False)  
+  If set to a list of chain IDs (e.g. `['B','C']`), those chains’ `unpairedMsa` fields will be replaced by the matching entries from your JSON.  
+  Chains not listed fall back to `>query\n…\n`.
+
+- `template_chains` (list[str] or False, default: False)  
+  If set to a list of chain IDs (e.g. `['B','C']`), those chains’ `templates` lists will be populated from your JSON.  
+  Chains not listed get an empty template list.
+
+> **Note:** If `msas_path` is omitted or either `_chains` param is `False`, **all** chains use only their query sequence for MSA and have no templates.
 
 **Outputs include:**  
 - CIF files for all predicted models (5 × `num_seeds` per design)  
