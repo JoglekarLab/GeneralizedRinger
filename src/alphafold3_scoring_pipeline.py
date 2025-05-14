@@ -8,7 +8,7 @@ import json
 import shutil
 
 class AlphaFold_3_ScoringPipeline:
-    def __init__(self, nsym, radius, account, general_env, pdb_input_folder_path, AF_folder, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None, dialect="alphafold3", version="3", pae_omit_pairs=None, plddt_chains=None):
+    def __init__(self, nsym, radius, account, general_env, pdb_input_folder_path, AF_folder, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None, dialect="alphafold3", version="3", pae_omit_pairs=None, plddt_chains=None, msas_path=False, msa_chains=False, template_chains=False):
         self.nsym = nsym
         self.radius = radius
         self.account = account
@@ -22,6 +22,10 @@ class AlphaFold_3_ScoringPipeline:
         self.pdb_input_folder = pdb_input_folder_path
         
         # AF3-specific configurations
+
+        self.msas_path = msas_path
+        self.msa_chains = msa_chains # e.g. ['A','B']
+        self.template_chains = template_chains # e.g. ['A','B']
         
         # IMPORTANT! Note that the AF3 config is hardcoded in the $AF3_SCRIPT_DIR/run_alphafold.py!
         # Hence, some parameters cannot be straightforwardly changed, such as the number of recycles, which is set to 10.
@@ -121,7 +125,73 @@ class AlphaFold_3_ScoringPipeline:
             protein_dicts.append(prot_entry)
             
         return protein_dicts
-            
+
+
+    
+    def get_sequences_dictionary(self, pdb_file):
+        """
+        Extracts sequence from a PDB file and returns a list of dicts for AF3.
+        
+        Args:
+            pdb_file: Path to the PDB file.
+            msas_path: Path to a JSON file containing MSA + template entries. False to skip.
+            msa_chains: list of str (e.g. ['A','B']) or False. Chains to use precomputed MSAs for.
+            template_chains: list of str (e.g. ['A','B']) or False. Chains to use templates for.
+
+        Returns:
+            List of dicts, one per chain, with keys:
+            - protein.id
+            - protein.sequence
+            - protein.modifications
+            - protein.unpairedMsa    (">query\n…\n" or from JSON)
+            - protein.pairedMsa      (always "")
+            - protein.templates      (empty list or from JSON)
+        """
+
+        if self.msa_chains and not self.msas_path:
+            raise ValueError("If msa_chains is provided, you must also provide msas_path.")
+        if self.template_chains and not self.msas_path:
+            raise ValueError("If template_chains is provided, you must also provide msas_path.")
+
+        msas_data = None
+        if self.msas_path:
+            with open(self.msas_path, 'r') as f:
+                data = json.load(f)
+                msas_data = data["sequences"]
+
+        parser = PDBParser(QUIET=True)
+        structure = parser.get_structure('X', pdb_file)
+        model = next(structure.get_models())
+
+        protein_dicts = []
+        for chain in model:
+            chain_id = chain.get_id()
+            seq = ''.join(self.three_to_one(res.resname) for res in chain)
+            no_msa = f">query\n{seq}\n"
+
+            entry = {
+                "protein": {
+                    "id":         chain_id,
+                    "sequence":   seq,
+                    "modifications": [],
+                    "unpairedMsa": no_msa,
+                    "pairedMsa":   "",
+                    "templates":   []
+                }
+            }
+
+            # Overwrite MSAs and templates if requested for this chain
+            if msas_data and self.msa_chains and chain_id in self.msa_chains:
+                record = next(item["protein"] for item in msas_data if item["protein"]["id"] == chain_id)
+                entry["protein"]["unpairedMsa"] = record["unpairedMsa"]
+
+            if msas_data and self.template_chains and chain_id in self.template_chains:
+                record = next(item["protein"] for item in msas_data if item["protein"]["id"] == chain_id)
+                entry["protein"]["templates"] = record["templates"]
+
+            protein_dicts.append(entry)
+
+        return protein_dicts            
         
     def generate_json_from_pdb(self, pdb_file):
         # generate seeds_number seeds randomly 
@@ -130,7 +200,7 @@ class AlphaFold_3_ScoringPipeline:
         
         # generate json file for the input
         json_file_path = os.path.join(self.json_folder, f'{name}.json')
-        protein_dicts = self.get_basic_sequences_dictionary(pdb_file)
+        protein_dicts = self.get_sequences_dictionary(pdb_file)
         json_dict = {
             "name": name,
             "sequences": protein_dicts,
@@ -324,8 +394,8 @@ conda activate {self.general_env}
         """Runs the entire AlphaFold prediction and analysis pipeline."""
         
         print("Submitting AlphaFold jobs...")
-        self.submit_af3_jobs()
-        self.monitor_af3_predictions()
+        # self.submit_af3_jobs()
+        # self.monitor_af3_predictions()
         print("Analyzing AlphaFold predicted structures...")
         self.analyze_af_predictions(rosetta_file_path, designs_scores)
         results = self.inspect_results(rmsd_threshold)
