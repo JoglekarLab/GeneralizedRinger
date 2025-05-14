@@ -39,21 +39,6 @@ def run_pipeline_function(pipeline, *args):
     pipeline.run_pipeline(*args)
 
 
-dirs = [
-    "0_Inputs",
-    "1_Geometry_Selection",
-    "2_Geometry_Clustering",
-    "3_MPNN_Design",
-    "4_Alphafold_Predictions",
-    "6_GenerateDesigns",
-    "7_Alphafold_Predictions",
-    "8_Final_Selection",
-]
-
-for d in dirs:
-    os.makedirs(os.path.join("..", d), exist_ok=True)
-
-
 # PARAMETERS
 # Parameters for selecting design chains (DesignGeneratorPipeline):
 # max_distance = 8.5
@@ -75,8 +60,10 @@ fixed_chains = "B,C"
 
 # Number of sequences to generate per temperature
 temperature_to_seq_count = {
-    0.15: 2,
-    0.25: 2
+    0.15: 10,
+    0.25: 10,
+    0.30: 10,
+    0.35: 10
 }
 
 # AF3
@@ -88,6 +75,26 @@ version=1 # Usually, stick to this
 pae_omit_pairs = [['B','C']]
 plddt_chains = ['A']
 
+msas_path= "../0_Inputs/msa_inputs/7b1f_data.json"
+msa_chains=['B','C'] # e.g. ['B','C']. Will determine which chains to use the unpairedMsas in msas_path for.
+template_chains=False # e.g. ['B','C']. Will determine which chains to use the templates in msas_path for.
+
+dirs = [
+    "0_Inputs",
+    "1_Geometry_Selection",
+    "2_Geometry_Clustering",
+    "3_MPNN_Design",
+    "4_Alphafold_Predictions",
+    "6_GenerateDesigns",
+    "7_Alphafold_Predictions",
+    "8_Final_Selection",
+]
+
+for d in dirs:
+    os.makedirs(os.path.join("..", d), exist_ok=True)
+
+msa_folder = os.path.join("..", "0_Inputs", "msa_inputs")
+os.makedirs(msa_folder, exist_ok=True)
 
 # GENERAL 
 # Paths
@@ -102,6 +109,15 @@ assert pdb_files, (
     f"No .pdb files found in {source_folder_geometries}.\n"
     "Remember to copy the geometries you want to analyze to {source_folder_geometries}"
 )
+
+# Check that all the files in source_folder_geometries are in lowercase. If there are any capital letters put it in lowercase
+for fname in pdb_files:
+    original = os.path.join(source_folder_geometries, fname)
+    lower_name = fname.lower()
+    lower_path = os.path.join(source_folder_geometries, lower_name)
+    if fname != lower_name:
+        os.rename(original, lower_path)
+        print(f"Renamed {fname}")
 
 # FIRST ROUND
 # Geometry Pipeline
