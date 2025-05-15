@@ -56,14 +56,18 @@ class RosettaScoringPipeline:
                 f.write(command)
 
     def submit_rosetta_jobfile(self):
-        """Step 2: Submit the Rosetta FastRelax jobfile using SLURM."""
+        # Depending on the number of lines in the jobfile_path, select how many ntasks to run
+        with open(self.jobfile_path, 'r') as jf:
+            num_lines = sum(1 for _ in jf)
+        ntasks = min(num_lines, 128)
+
         script_content = f"""#!/bin/bash
 #SBATCH --job-name={self.nsym}{self.radius}FR
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
 #SBATCH --partition=standard
-#SBATCH --time=4:00:00
-#SBATCH --ntasks=416
+#SBATCH --time=2:00:00
+#SBATCH --ntasks={ntasks}
 #SBATCH --mem-per-cpu=4GB
 #SBATCH --cpus-per-task=1
 #SBATCH --account={self.account}
