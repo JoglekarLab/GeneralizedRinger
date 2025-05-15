@@ -178,14 +178,18 @@ conda activate {self.general_env}
                 f.write(command + '\n')
 
     def submit_mutation_job(self, previous_job_id=None):
-        """Step 7: Submit the jobfile with SLURM."""
+        # Depending on the number of lines in the jobfile_path, select how many ntasks to run
+        with open(self.jobfile_path, 'r') as jf:
+            num_lines = sum(1 for _ in jf)
+        ntasks = min(num_lines, 128)
+
         script_content = f"""#!/bin/bash
 #SBATCH --job-name={self.nsym}{self.radius}pyR
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
 #SBATCH --partition=standard
-#SBATCH --time=4:00:00
-#SBATCH --ntasks=416
+#SBATCH --time=2:00:00
+#SBATCH --ntasks={ntasks}
 #SBATCH --mem-per-cpu=4GB
 #SBATCH --cpus-per-task=1
 #SBATCH --account={self.account}
