@@ -227,7 +227,7 @@ class AlphaFold_3_ScoringPipeline:
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1:15:00
+#SBATCH --time=5:00
 #SBATCH --mem=128GB
 #SBATCH --account={self.account}
 
