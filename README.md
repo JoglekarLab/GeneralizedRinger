@@ -15,6 +15,9 @@ You can run `main.py` directly using the `run_main.sh` script. The recommended w
 ### OVERVIEW 
 
 Generalized Ringer helps you build your custum protein design workflow from modular pipelines. The workflow is initially designed as the following:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/de5912b6-bf07-47ea-945b-bd5a372b1a99" alt="ringer_generalized2" />
+</p>
 
 ![ringer_generalized2](https://github.com/user-attachments/assets/de5912b6-bf07-47ea-945b-bd5a372b1a99)
 
