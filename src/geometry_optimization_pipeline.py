@@ -173,26 +173,26 @@ conda activate {self.general_env}
             raise RuntimeError(f"Failed to submit clustering job: {result.stderr}")
     
     def run_pipeline(self):
-        # # 1. Geometry Optimization
-        # job_ids = self.run_slurm_scripts()      
-        # JobManager.check_job_completion(job_ids)  
-        # self.join_results()
+        # 1. Geometry Optimization
+        job_ids = self.run_slurm_scripts()      
+        JobManager.check_job_completion(job_ids)  
+        self.join_results()
         
-        # combined_file = os.path.join(self.geometry_folder_path, "geometry_total_scores_long.csv")
-        # df = pd.read_csv(combined_file)
-        # df = df[df['nSym'] == self.nsym]
-        # df = df.sort_values(by=['score*n_contacts'], ascending=False)
-        # df = df.drop_duplicates(subset=['radius', 'nSym', 'rotx', 'roty', 'rotz'], keep='first')
-        # df['radius'] = df['radius'].apply(lambda x: float(x))
-        # unselected_file = os.path.join(self.geometry_folder_path, "geometry_total_scores_unselected.csv")
-        # selected_file = os.path.join(self.geometry_folder_path, "geometry_total_scores.csv")
-        # df.to_csv(unselected_file, index=False)
-        # df.to_csv(selected_file, index=False)
-        # print(f"Processed results saved to {selected_file}")
+        combined_file = os.path.join(self.geometry_folder_path, "geometry_total_scores_long.csv")
+        df = pd.read_csv(combined_file)
+        df = df[df['nSym'] == self.nsym]
+        df = df.sort_values(by=['score*n_contacts'], ascending=False)
+        df = df.drop_duplicates(subset=['radius', 'nSym', 'rotx', 'roty', 'rotz'], keep='first')
+        df['radius'] = df['radius'].apply(lambda x: float(x))
+        unselected_file = os.path.join(self.geometry_folder_path, "geometry_total_scores_unselected.csv")
+        selected_file = os.path.join(self.geometry_folder_path, "geometry_total_scores.csv")
+        df.to_csv(unselected_file, index=False)
+        df.to_csv(selected_file, index=False)
+        print(f"Processed results saved to {selected_file}")
         
-        # # 2. Generate best PDB files
-        # pdb_job_ids = self.generate_pdb_files()
-        # JobManager.check_job_completion(pdb_job_ids)
+        # 2. Generate best PDB files
+        pdb_job_ids = self.generate_pdb_files()
+        JobManager.check_job_completion(pdb_job_ids)
 
         # 3. Cluster and select files
         self.run_clustering()
