@@ -19,8 +19,6 @@ Generalized Ringer helps you build your custum protein design workflow from modu
   <img src="https://github.com/user-attachments/assets/de5912b6-bf07-47ea-945b-bd5a372b1a99" alt="ringer_generalized2" />
 </p>
 
-![ringer_generalized2](https://github.com/user-attachments/assets/de5912b6-bf07-47ea-945b-bd5a372b1a99)
-
 ### Geometry Scoring Pipeline
 
 The Geometry Scoring Pipeline assigns a score based on Cα–Cα distances between pairs of interacting residues: distances that match a reference helix–helix contact distribution receive higher scores. You can customize what counts as a “contact” by setting:
@@ -102,7 +100,9 @@ The following are user parameters related to the multiple sequence alignment for
 ### STANDALONE NOTEBOOKS
 The notebooks are there to help you through the pipeline. The recommended use of the notebooks is the following:
 
-![ringer_generalized4](https://github.com/user-attachments/assets/94edb0f8-2a02-47f4-98ad-f81b867f1321)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/94edb0f8-2a02-47f4-98ad-f81b867f1321" alt="ringer_generalized4" />
+</p>
 
 
 ## References
