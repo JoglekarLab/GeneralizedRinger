@@ -48,7 +48,7 @@ def get_basic_sequences_dictionary (pdb_file):
     return protein_dicts
         
     
-def generate_json_from_pdb(pdb_file, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None):
+def generate_json_from_pdb_original(pdb_file, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None):
     # generate seeds_number seeds randomly 
     model_seeds = seeds_generator(seeds_number, predefined_seeds, predefined_seeds_list)
     name = os.path.basename(pdb_file).replace('.pdb', '')
@@ -67,22 +67,87 @@ def generate_json_from_pdb(pdb_file, json_folder, dialect, version, slurm_folder
         json.dump(json_dict, f, indent=4)
     print(f'{json_file_path} json file generated')
     return json_file_path 
-    
-def prepare_slurm_script(pdb_input_file, output_folder, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None):
+
+
+def generate_json_from_pdb (pdb_file, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None, msa=True, unpaired_msa=None, unpaired_msa_path=None):
+    """
+    Two modes only:
+      - msa=True  -> leave MSA fields unset (AF3 builds unpaired & paired MSAs).
+      - msa=False -> do NOT build MSAs:
+                       * if unpaired_msa{,_path} provided for a chain:
+                           set unpairedMsa{,Path}, set pairedMsa=""
+                         else:
+                           set unpairedMsa="" and pairedMsa="" (MSA-free).
+    """
+    # generate seeds_number seeds randomly
+    model_seeds = seeds_generator(seeds_number, predefined_seeds, predefined_seeds_list)
+    name = os.path.basename(pdb_file).replace('.pdb', '')
+
+    # generate json file for the input
+    json_file_path = os.path.join(json_folder, f'{name}.json')
+    protein_dicts = get_basic_sequences_dictionary(pdb_file)
+
+    unpaired_msa = unpaired_msa or {}
+    unpaired_msa_path = unpaired_msa_path or {}
+
+    for entry in protein_dicts:
+        prot = entry.get("protein", {})
+        chain_id = prot.get("id")
+
+        if msa:
+            # AF3 will build MSA fields
+            continue
+
+        # If msa is False
+        if not msa:
+            if chain_id in unpaired_msa and unpaired_msa[chain_id]:
+                unpaired = unpaired_msa[chain_id]
+                paired = ""
+            elif chain_id in unpaired_msa_path and unpaired_msa_path[chain_id]:
+                unpaired = unpaired_msa_path[chain_id]
+                paired = ""
+            else:
+                # Completely MSA-free: model input is just the query sequence
+                unpaired = ""
+                paired = ""
+        
+        entry["protein"] = {
+            "id": chain_id,
+            "sequence": prot.get("sequence"),
+            "unpairedMsa": unpaired,
+            "pairedMsa": paired,
+            "templates": []
+        }
+
+    json_dict = {
+        "name": name,
+        "sequences": protein_dicts,
+        "modelSeeds": model_seeds,
+        "dialect": dialect,
+        "version": version
+    }
+
+    with open(json_file_path, 'w') as f:
+        json.dump(json_dict, f, indent=4)
+    print(f'{json_file_path} json file generated')
+    return json_file_path
+
+
+def prepare_slurm_script(pdb_input_file, output_folder, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None, msa=True, unpaired_msa=None, unpaired_msa_path=None):
     """Prepare a SLURM script for running AlphaFold3 on the input FASTA file."""
 
-    input_json_file_path = generate_json_from_pdb(pdb_input_file, json_folder, dialect, version, slurm_folder, account, seeds_number, predefined_seeds, predefined_seeds_list)
+    input_json_file_path = generate_json_from_pdb(pdb_input_file, json_folder, dialect, version, slurm_folder, account, seeds_number, predefined_seeds, predefined_seeds_list, msa, unpaired_msa, unpaired_msa_path)
 
     script_content = f'''#!/bin/bash
 #SBATCH --job-name=AF3
 #SBATCH --output={slurm_folder}/AF3_%j.out
 #SBATCH --error={slurm_folder}/AF3_%j.err
-#SBATCH --partition=gpu_mig40
+#SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=2:40:00
+#SBATCH --time=20:00
 #SBATCH --mem=128GB
 #SBATCH --account={account}
 
@@ -101,8 +166,8 @@ export XLA_FLAGS="--xla_gpu_enable_triton_gemm=false \
 module load Bioinformatics alphafold/3.0.0
 
 # Run AF3
-# example: python $AF3_SCRIPT_DIR/run_alphafold.py --json_path=$AF3_PARAMS_DIR/input/fold_input.json --output_dir=your_output_dir --db_dir=$AF3_PARAMS_DIR/db_dir --model_dir=$AF3_PARAMS_DIR/af3_model_params
-python $AF3_SCRIPT_DIR/run_alphafold.py --json_path={input_json_file_path} --output_dir={output_folder} --db_dir=$AF3_PARAMS_DIR/db_dir --model_dir=$AF3_PARAMS_DIR/af3_model_params
+# example: python $AF3_SCRIPT_DIR/run_alphafold.py --json_path=$AF3_PARAMS_DIR/input/fold_input.json --output_dir=your_output_dir --db_dir=$AF3_PARAMS_DIR/db_dir --model_dir=$AF3_PARAMS_DIR/af3_model_params --flash_attention_implementation=xla
+python $AF3_SCRIPT_DIR/run_alphafold.py --json_path={input_json_file_path} --output_dir={output_folder} --db_dir=$AF3_PARAMS_DIR/db_dir --model_dir=$AF3_PARAMS_DIR/af3_model_params --flash_attention_implementation=xla
 
 module unload alphafold
 '''
@@ -114,7 +179,7 @@ module unload alphafold
     return slurm_script_path
 
 
-def submit_af3_jobs(pdb_input_folder, AF_output_folder, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None):
+def submit_af3_jobs(pdb_input_folder, AF_output_folder, json_folder, dialect, version, slurm_folder, account, seeds_number=3, predefined_seeds=False, predefined_seeds_list=None, msa=True, unpaired_msa=None, unpaired_msa_path=None):
     """Generate and submit SLURM jobs for AlphaFold3 predictions.
             For each PDB file in the input folder, a corresponding JSON file is generated.
             Then, a SLURM script is created and submitted.
@@ -132,7 +197,7 @@ def submit_af3_jobs(pdb_input_folder, AF_output_folder, json_folder, dialect, ve
         
         # Prepare and submit the SLURM script
         print(f"Submitting {pdb_file_path}")
-        slurm_script_path = prepare_slurm_script(pdb_file_path, output_folder, json_folder, dialect, version, slurm_folder, account, seeds_number, predefined_seeds, predefined_seeds_list)
+        slurm_script_path = prepare_slurm_script(pdb_file_path, output_folder, json_folder, dialect, version, slurm_folder, account, seeds_number, predefined_seeds, predefined_seeds_list, msa, unpaired_msa, unpaired_msa_path)
         result = subprocess.run(["sbatch", slurm_script_path], capture_output=True, text=True)
         job_id = result.stdout.strip().split()[-1] if result.returncode == 0 else None
         
@@ -140,3 +205,48 @@ def submit_af3_jobs(pdb_input_folder, AF_output_folder, json_folder, dialect, ve
             print(f"AlphaFold3 job for {pdb_file} submitted with Job ID: {job_id}")
             job_ids.append(job_id)
     return job_ids
+
+def analyze_af_predictions(account, general_env, finished_predictions, pdb_input_folder, plddt_chains=False, pae_omit_pairs=False):
+    """Analyze AlphaFold predicted structures using AF_process_results.py."""
+    command = f'python AF_process_results.py --finished_predictions {finished_predictions} --pdb_input_folder {pdb_input_folder}'
+
+    if pae_omit_pairs:
+        for c1, c2 in pae_omit_pairs:
+            command += f' --omit_pair {c1},{c2}'
+
+    if plddt_chains:
+        command += ' --plddt_chains ' + ' '.join(plddt_chains)
+
+    slurm_script_name = f"AF_process_results.sh"
+    script_content = f"""#!/bin/bash
+#SBATCH --job-name=AF_analysis
+#SBATCH --output=%j.out
+#SBATCH --error=%j.err
+#SBATCH --mem=4GB
+#SBATCH --time=8:00:00
+#SBATCH --account={account}
+
+# Activate conda environment
+eval "$(conda shell.bash hook)"
+conda activate {general_env}
+
+# Run the python script
+{command}
+"""
+    # Write SLURM script and submit it
+    with open(slurm_script_name, 'w') as f:
+        f.write(script_content)
+    
+    result = subprocess.run(["sbatch", slurm_script_name], capture_output=True, text=True)
+    job_id = result.stdout.strip().split()[-1] if result.returncode == 0 else None
+
+def inspect_results(finished_predictions, rmsd_threshold=3.5):
+    """Inspect and process the final AlphaFold results."""
+    AF_results_path = f"{finished_predictions}/AF_results.csv"
+    print (f'Max RMSD to target geometry is {rmsd_threshold} Å')
+    df_AF_results = pd.read_csv(AF_results_path)
+    df_AF_results = df_AF_results[df_AF_results['rmsd'] < rmsd_threshold]
+    df_AF_results.sort_values(by='ipTM', ascending=False, inplace=True)
+    if df_AF_results['rmsd'].isnull().any():
+        print("**** WARNING: Some rows have NaN values. ****")
+    return df_AF_results
